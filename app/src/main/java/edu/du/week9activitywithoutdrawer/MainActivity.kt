@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         adapter = NameAdapter(list) { contact: Contact ->
             if (useDrawer) {
-                //showDrawer(contact)
+                showDrawer(contact)
             } else {
                 showDialog(contact)
             }
@@ -40,16 +40,16 @@ class MainActivity : AppCompatActivity() {
         recycler.adapter = adapter
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ ->
             if (useDrawer) {
-                //showDrawer(null)
+                showDrawer(null)
             } else {
                 showDialog(null)
             }
         }
     }
 
-    fun showDialog(contact: Contact?) {
+    private fun showDialog(contact: Contact?) {
         val dialogBuilder = AlertDialog.Builder(this)
         val layout = LayoutInflater.from(this).inflate(R.layout.view_dialog, null)
         dialogBuilder.setView(layout)
@@ -64,8 +64,14 @@ class MainActivity : AppCompatActivity() {
 
         dialog.show()
     }
-
-    fun connectViews(layout: View, contact: Contact?, dialog: Dialog) {
+    private fun showDrawer(contact: Contact?) {
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val layout = LayoutInflater.from(this).inflate(R.layout.view_dialog, null)
+        bottomSheetDialog.setContentView(layout)
+        connectViews(layout, contact, bottomSheetDialog)
+        bottomSheetDialog.show()
+    }
+    private fun connectViews(layout: View, contact: Contact?, dialog: Dialog) {
         val editName = layout.findViewById<EditText>(R.id.edit_name)
         val editPhone = layout.findViewById<EditText>(R.id.edit_phone)
         if (contact != null) {
@@ -90,5 +96,14 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
 
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_switch_input -> {
+                useDrawer = !useDrawer
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
